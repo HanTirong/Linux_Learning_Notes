@@ -1,5 +1,5 @@
 test: a.o b.o c.o
 	gcc -o test $^
-	
-%.o : %.c
+
+%.o: %.c
 	gcc -c -o $@ $<

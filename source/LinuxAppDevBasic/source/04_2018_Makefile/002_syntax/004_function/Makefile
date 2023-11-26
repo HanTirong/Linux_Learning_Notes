@@ -1,20 +1,16 @@
-
-A = a b c 
-B = $(foreach f, $(A), $(f).o)
-
+A = a b c
+B = $(foreach f,$(A),$(f).o)
 
 C = a b c d/
-
-D = $(filter %/, $(C))
-E = $(filter-out %/, $(C))
+D = $(filter %/,$(C))
+E = $(filter-out %/,$(C))
 
 files = $(wildcard *.c)
 
-
-files2 = a.c b.c c.c d.c e.c  abc
+files2 = a.c b.c c.c d.c e.c
 files3 = $(wildcard $(files2))
 
-dep_files = $(patsubst %.c,%.d,$(files2))
+dep_files = $(patsubst %.c,%.d, $(files2))
 
 all:
 	@echo B = $(B)
