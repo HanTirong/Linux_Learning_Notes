@@ -9,8 +9,8 @@
                 |                  |                |
                 |                  |                |
 App<---链接---机器码(.o)<--汇编--汇编码(.S)<---编译----|(.i)<---预处理--- (.c .h)
-                |           |
-                |---反汇编-->|
+                |                   |
+                |------反汇编------->|
 
 ```
 2. [代码](../../source/LinuxAppDevBasic/source/02_options/01_hello/hello.c)
@@ -33,16 +33,16 @@ App<---链接---机器码(.o)<--汇编--汇编码(.S)<---编译----|(.i)<---预�
 3. `#include "dir"`是在当前目录下查找，`#include <dir>`是从系统工具链指定的目录去查找
 4. -I指定头文件目录 `gcc -c -o main.o main.c -v -I ./`
 5. 制作、使用静态库
-- `gcc -c -o sub.o sub.c`
-- `ar crs libsub.a sub.o sub2.o(等等多个.o文件)`
-- `gcc -o test main.o libsub.a`
-- 不需要把静态库 libsub.a 放到板子上
+    - `gcc -c -o sub.o sub.c`
+    - `ar crs libsub.a sub.o sub2.o(等等多个.o文件)`
+    - `gcc -o test main.o libsub.a`
+    - 不需要把静态库 libsub.a 放到板子上
 
 6. 制作、使用动态库
-- `gcc -c -o sub.o sub.c`
-- `gcc -shared -o libsub.so sub.o sub2.o(等等多个.o文件)`
-- `gcc -o test main.o -lsub -L /libsub.so/所在目录/`
-- 执行 `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/a` ,目录a表示libsub.so所在的目录，然后才能运行
+    - `gcc -c -o sub.o sub.c`
+    - `gcc -shared -o libsub.so sub.o sub2.o(等等多个.o文件)`
+    - `gcc -o test main.o -lsub -L /libsub.so/所在目录/`
+    - 执行 `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/a` ,目录a表示libsub.so所在的目录，然后才能运行
 
 7. 使用`file test`指令查看是可以在什么平台的运行的
 
