@@ -30,7 +30,7 @@ App<---链接---机器码(.o)<--汇编--汇编码(.S)<---编译----|(.i)<---预�
 #### [2-2] GCC常用选项
 1. [代码](../../source/LinuxAppDevBasic/source/02_options/02_multi_files/main.c)
 2. 输入 `gcc -o test main.c sub.c` 会将每一个c文件都编译，然后最后进行链接，因此如果多个文件中只有一个文件被修改了，可考虑对被修改的文件单独去编译，然后再和其他文件一起链接
-3. `#include "dir"`是在当前目录下查找，`#include <dir>`是从系统工具链指定的目录去查找
+3. `#include "dir"`是在当前目录下查找，`#include <dir>`是从系统工具链指定的目录去查找以及`-I`指定的目录下查找  
 4. -I指定头文件目录 `gcc -c -o main.o main.c -v -I ./`
 5. 制作、使用静态库
     - `gcc -c -o sub.o sub.c`

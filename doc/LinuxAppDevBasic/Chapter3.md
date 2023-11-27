@@ -52,11 +52,17 @@
 - `$(patsubst pattern,replacement, $(var))` 从列表中取出每一个值，如果符合pattern，则替换为replacement
 
 #### [3-5] Makefile实例
+1. 改进：支持头文件依赖
+    - `gcc -M a.c`  //打印出a.c的依赖文件
+    - `gcc -M -MF a.d a.c`  //打印a.c的依赖文件并存到a.d中
+    - `gcc -c -o c.o c.c -MD -MF c.d` // 编译c.o，把依赖写入文件c.d
+[代码](../../source/LinuxAppDevBasic/source/04_2018_Makefile/003_example/Makefile)
 
-
+2. 添加CFLAGS
+    - 建议用gcc编译的时候添加  `-Werror`
 
 #### [3-6] 通用Makefile的使用
-
+[点击此处查看](../../source/LinuxAppDevBasic/source/05_general_Makefile/Makefile_and_readme/)
 
 
 #### [3-7] 通用Makefile的解析

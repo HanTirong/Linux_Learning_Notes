@@ -1,25 +1,28 @@
 
-objs = a.o b.o c.o
 
-dep_files := $(patsubst %,.%.d, $(objs))
-dep_files := $(wildcard $(dep_files))
+objs = a.o c.o b.o
 
-CFLAGS = -Werror -Iinclude
+dep_fils := $(patsubst %, .%.d, $(objs))
+dep_fils := $(wildcard $(dep_fils))
+
+CFLAGS = -Werror -I include/
 
 test: $(objs)
 	gcc -o test $^
 
-ifneq ($(dep_files),)
-include $(dep_files)
+ifneq ($(dep_fils),)  #如果该变量不为空就包含进来
+include $(dep_fils)
 endif
 
-%.o : %.c
+c.o: c.c c.h
+
+%.o: %.c
 	gcc $(CFLAGS) -c -o $@ $< -MD -MF .$@.d
 
 clean:
 	rm *.o test
 
 distclean:
-	rm $(dep_files)
-	
-.PHONY: clean	
+	rm $(dep_fils)
+
+.PHONY: clean
