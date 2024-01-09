@@ -16,17 +16,15 @@
 int main(int argc, char **argv)
 {
     int fd;
-    
-    if (argc != 2)
+    if(argc != 2)
     {
         printf("Usage: %s <file>\n", argv[0]);
         return -1;
     }
-
-    fd = open(argv[1], O_RDWR | O_CREAT | O_TRUNC, 0777);
-    if (fd < 0)
+    fd = open(argv[1],O_RDWR | O_CREAT | O_TRUNC, 0666); // 可读可写 | 不存在则创建 | 若存在则截断
+    if(fd < 0)
     {
-        printf("can not open file %s\n", argv[1]);
+        printf("cant open file %s\n", argv[1]);
         printf("errno = %d\n", errno);
         printf("err: %s\n", strerror(errno));
         perror("open");
@@ -36,12 +34,11 @@ int main(int argc, char **argv)
         printf("fd = %d\n", fd);
     }
 
-    while (1)
-    {
+    while(1){
         sleep(10);
     }
-
     close(fd);
+
     return 0;
 }
 
