@@ -29,12 +29,13 @@ lrwx------ 1 book book 64 Jan  9 09:45 3 -> /home/book/01_all_series_quickstart/
 6. 对于root用户，返回 0022 表示 000, 010, 010
 
 ## [4-4] 使用write函数写文件
-
-
+1. [相关代码1](../../source/LinuxAppDevBasic/source/06_fileio/03_write/write.c)
+2. [相关代码2](../../source/LinuxAppDevBasic/source/06_fileio/03_write/write_in_pos.c)
+3. 注意： `write()` 如果移动到某个位置开始写，则会覆盖该位置以后的
 
 ## [4-5] 使用read函数读文件
-
-
+1. [相关代码](../../source/LinuxAppDevBasic/source/06_fileio/04_read/read.c)
+2. 注意： `read()` 每读一次，pos就会移动到当前位置
 
 ## [4-6] 综合实验_处理表格
 
