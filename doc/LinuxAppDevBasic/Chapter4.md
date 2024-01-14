@@ -38,7 +38,12 @@ lrwx------ 1 book book 64 Jan  9 09:45 3 -> /home/book/01_all_series_quickstart/
 2. 注意： `read()` 每读一次，pos就会移动到当前位置
 
 ## [4-6] 综合实验_处理表格
-
+1. [相关代码](../../source/LinuxAppDevBasic/source/06_fileio/05_process_excel/process_excel.c)
+2. `hexdump -C score.csv` :查看score.csv文件内容的16进制形式
+3. 一个文件的每一行结尾是回车换行
+4. `sscanf()` 从字符串里面按照指定格式提取输入 
+5. `sprintf()` 往字符串里面按照格式填写字符串
+6. utf-8格式的文件内容开头是0xef,0xbb,0xbf 三个字节代表编码格式
 
 
 ## [4-7] 文件IO系统调用内部机制
