@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 
 	/* 随便设置出100个为红色 */
 	for (i = 0; i < 100; i++)
-		lcd_put_pixel(var.xres/2+i, var.yres/2, 0xFF0000);
+		lcd_put_pixel(var.xres/2+i, var.yres/2, 0x0000FF);
 	
 	munmap(fb_base , screen_size);
 	close(fd_fb);
