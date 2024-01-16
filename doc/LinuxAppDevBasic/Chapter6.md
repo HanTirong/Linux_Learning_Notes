@@ -6,8 +6,8 @@
 3. Unicode: 每一个字符对应一个编码
 
 ## [6-2] ASCII字符的点阵显示
-
-
+1. 常用的是8*16的点阵，表示x方向8个像素(1字节)，y方向16个像素(16行)
+2. [代码](../../source/LinuxAppDevBasic/source/08_show_ascii/show_ascii.c)
 
 ## [6-3] 中文字符的点阵显示
 

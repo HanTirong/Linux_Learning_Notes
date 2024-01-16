@@ -4690,13 +4690,13 @@ void lcd_put_pixel(int x, int y, unsigned int color)
  ***********************************************************************/ 
 void lcd_put_ascii(int x, int y, unsigned char c)
 {
-	unsigned char *dots = (unsigned char *)&fontdata_8x16[c*16];
+	unsigned char *dots = (unsigned char *)&fontdata_8x16[c*16]; // 一个字符占16个字节
 	int i, b;
 	unsigned char byte;
 
 	for (i = 0; i < 16; i++)
 	{
-		byte = dots[i];
+		byte = dots[i];	//第i个字节
 		for (b = 7; b >= 0; b--)
 		{
 			if (byte & (1<<b))
@@ -4715,6 +4715,9 @@ void lcd_put_ascii(int x, int y, unsigned char c)
 
 int main(int argc, char **argv)
 {
+	char str1[] = {'o', '=','[',']',':',':',':',':',':',':','>'};
+	int str1len = 11;
+	
 	fd_fb = open("/dev/fb0", O_RDWR);
 	if (fd_fb < 0)
 	{
@@ -4740,8 +4743,11 @@ int main(int argc, char **argv)
 	/* 清屏: 全部设为黑色 */
 	memset(fbmem, 0, screen_size);
 
-	lcd_put_ascii(var.xres/2, var.yres/2, 'A'); /*在屏幕中间显示8*16的字母A*/
-	
+	//lcd_put_ascii(var.xres/2, var.yres/2, ''); /*在屏幕中间显示8*16的字母A*/
+	for(int i = 0;i < str1len; i++)
+	{
+		lcd_put_ascii(10 * i + var.xres/2, var.yres/2, str1[i]);
+	}
 	munmap(fbmem , screen_size);
 	close(fd_fb);
 	
