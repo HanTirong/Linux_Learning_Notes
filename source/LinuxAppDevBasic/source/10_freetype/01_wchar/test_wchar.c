@@ -4,7 +4,7 @@
 
 int main( int argc, char** argv)
 {
-	wchar_t *chinese_str = L"��gif";
+	wchar_t *chinese_str = L"鸡你太美gif";
 	unsigned int *p = (wchar_t *)chinese_str;
 	int i;
 

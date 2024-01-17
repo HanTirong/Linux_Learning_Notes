@@ -4737,11 +4737,11 @@ void lcd_put_chinese(int x, int y, unsigned char *str)
 	unsigned char byte;
 
 	int i, j, b;
-	for (i = 0; i < 16; i++)
-		for (j = 0; j < 2; j++)
+	for (i = 0; i < 16; i++)	/*16行*/
+		for (j = 0; j < 2; j++)	/*每行2个字节*/
 		{
-			byte = dots[i*2 + j];
-			for (b = 7; b >=0; b--)
+			byte = dots[i*2 + j];	
+			for (b = 7; b >=0; b--) /*每个字节有8位*/
 			{
 				if (byte & (1<<b))
 				{
@@ -4759,7 +4759,9 @@ void lcd_put_chinese(int x, int y, unsigned char *str)
 
 int main(int argc, char **argv)
 {
-	unsigned char str[] = "中";
+	unsigned char str1[4][4] = {"鸡", "你", "太", "美"};
+	int strLen = 4;
+
 	
 	fd_fb = open("/dev/fb0", O_RDWR);
 	if (fd_fb < 0)
@@ -4807,8 +4809,12 @@ int main(int argc, char **argv)
 
     lcd_put_ascii(var.xres/2, var.yres/2, 'A'); /*在屏幕中间显示8*16的字母A*/
 	
-	printf("chinese code: %02x %02x\n", str[0], str[1]);
-	lcd_put_chinese(var.xres/2 + 8,  var.yres/2, str);
+	for(int i=0; i< strLen; i++)
+	{
+		printf("chinese code: %02x %02x\n", str1[i][0], str1[i][1]);
+		lcd_put_chinese(32 * i + var.xres/2 + 8,  var.yres/2, str1[i]);
+	}
+
 
 	munmap(fbmem , screen_size);
 	close(fd_fb);

@@ -110,7 +110,7 @@ draw_bitmap( FT_Bitmap*  bitmap,
 
 int main(int argc, char **argv)
 {
-	wchar_t *chinese_str = L"繁";
+	wchar_t *chinese_str = L"龍";
 
 	FT_Library	  library;
 	FT_Face 	  face;
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
 	error = FT_Init_FreeType( &library );			   /* initialize library */
 	/* error handling omitted */
 	
-	error = FT_New_Face( library, argv[1], 0, &face ); /* create face object */
+	error = FT_New_Face( library, argv[1], 0, &face ); /* create face object */ /*argv[1]是字体文件*/
 	/* error handling omitted */	
 	slot = face->glyph;
 
