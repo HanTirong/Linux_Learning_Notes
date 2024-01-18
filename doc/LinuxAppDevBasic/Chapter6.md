@@ -56,5 +56,27 @@
 
 
 ## [6-6] 使用freetype显示一行文字
+1. [代码](../../source/LinuxAppDevBasic/source/10_freetype/04_show_line/show_line.c)
+2. freetype的几个重要数据结构
+- FT_Library : 使用freetype之前要先调用以下代码
+``` C
+FT_Library library;
+error = FT_Init_FreeType(&library); /*初始化freetype库*/
+```
 
+- FT_Face: 对应一个矢量字体文件
+``` C
+error = FT_New_Face(libray, font_file, 0, &face); /*加载字体文件*/
+```
 
+- FT_GlyphSlot: 插槽，用来存放字符的处理结果（如：位图、边框、位置信息等），注意只能存一次，下一次的存入会覆盖前一次的结果
+
+- FT_Glyph: 字体文件中保存字符的原始关键点信息，使用freetype的函数可以进行放大、缩小、旋转，处理后新的关键点也保存在插槽里
+``` C
+error = FT_Get_Glyph(slot, &glyph);
+```
+
+- FT_BBox: 表示一个字符的外框
+``` C
+FT_Glyph_Get_Box(glyph, FT_GLYPH_BBOX_TRUNATE, &bbox);
+```
