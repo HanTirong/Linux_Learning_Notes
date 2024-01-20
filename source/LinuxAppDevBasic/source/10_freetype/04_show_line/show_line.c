@@ -74,8 +74,7 @@ void lcd_put_pixel(int x, int y, unsigned int color)
  * -----------------------------------------------
  * 2020/05/12        V1.0     zh(angenao)         创建
  ***********************************************************************/ 
-void
-draw_bitmap( FT_Bitmap*  bitmap,
+void draw_bitmap( FT_Bitmap*  bitmap,
              FT_Int      x,
              FT_Int      y)
 {
@@ -85,17 +84,20 @@ draw_bitmap( FT_Bitmap*  bitmap,
 
     //printf("x = %d, y = %d\n", x, y);
 
-    for ( j = y, q = 0; j < y_max; j++, q++ )
+    for ( j = y, q = 0; j < y_max; j++, q++ )   /*遍历每一行*/
     {
-        for ( i = x, p = 0; i < x_max; i++, p++ )
+        for ( i = x, p = 0; i < x_max; i++, p++ )   /*遍历每一行的每个字节*/
         {
             if ( i < 0      || j < 0       ||
                 i >= var.xres || j >= var.yres )
             continue;
 
             //image[j][i] |= bitmap->buffer[q * bitmap->width + p];
-            lcd_put_pixel(i, j, bitmap->buffer[q * bitmap->width + p]);
-        }
+            //lcd_put_pixel(i, j, bitmap->buffer[q * bitmap->width + p]); /*buffer只有一个字节，因此只能显示蓝色*/
+            if(bitmap->buffer[q * bitmap->width + p])
+                lcd_put_pixel(i, j, 0x00164c8c);
+            
+        }   
     }
 }
 
@@ -108,6 +110,8 @@ int compute_string_bbox(FT_Face       face, wchar_t *wstr, FT_BBox  *abbox)
     FT_Vector pen;
     FT_Glyph  glyph;
     FT_GlyphSlot slot = face->glyph;
+    //FT_Matrix	  matrix;				  /* transformation matrix */
+
 
     /* 初始化 */
     bbox.xMin = bbox.yMin = 32000;
@@ -116,6 +120,12 @@ int compute_string_bbox(FT_Face       face, wchar_t *wstr, FT_BBox  *abbox)
     /* 指定原点为(0, 0) */
     pen.x = 0;
     pen.y = 0;
+    /* set up matrix */
+	//matrix.xx = (FT_Fixed)( cos( angle ) * 0x10000L );
+	//matrix.xy = (FT_Fixed)(-sin( angle ) * 0x10000L );
+	//matrix.yx = (FT_Fixed)( sin( angle ) * 0x10000L );
+	//matrix.yy = (FT_Fixed)( cos( angle ) * 0x10000L );
+
 
     /* 计算每个字符的bounding box */
     /* 先translate, 再load char, 就可以得到它的外框了 */
@@ -166,7 +176,7 @@ int compute_string_bbox(FT_Face       face, wchar_t *wstr, FT_BBox  *abbox)
 }
 
 
-int display_string(FT_Face     face, wchar_t *wstr, int lcd_x, int lcd_y)
+int display_string(FT_Face     face, wchar_t *wstr, int lcd_x, int lcd_y, double angle)
 {
     int i;
     int error;
@@ -174,6 +184,7 @@ int display_string(FT_Face     face, wchar_t *wstr, int lcd_x, int lcd_y)
     FT_Vector pen;
     FT_Glyph  glyph;
     FT_GlyphSlot slot = face->glyph;
+    FT_Matrix	  matrix;				  /* transformation matrix */
 
     /* 把LCD坐标转换为笛卡尔坐标 */
     int x = lcd_x;
@@ -185,12 +196,16 @@ int display_string(FT_Face     face, wchar_t *wstr, int lcd_x, int lcd_y)
     /* 反推原点 */
     pen.x = (x - bbox.xMin) * 64; /* 单位: 1/64像素 */
     pen.y = (y - bbox.yMax) * 64; /* 单位: 1/64像素 */
-
+    /* set up matrix */
+	matrix.xx = (FT_Fixed)( cos( angle ) * 0x10000L );
+	matrix.xy = (FT_Fixed)(-sin( angle ) * 0x10000L );
+	matrix.yx = (FT_Fixed)( sin( angle ) * 0x10000L );
+	matrix.yy = (FT_Fixed)( cos( angle ) * 0x10000L );
     /* 处理每个字符 */
     for (i = 0; i < wcslen(wstr); i++)
     {
         /* 转换：transformation */
-        FT_Set_Transform(face, 0, &pen);
+        FT_Set_Transform(face, &matrix, &pen);
 
         /* 加载位图: load glyph image into the slot (erase previous one) */
         error = FT_Load_Char(face, wstr[i], FT_LOAD_RENDER);
@@ -216,7 +231,9 @@ int display_string(FT_Face     face, wchar_t *wstr, int lcd_x, int lcd_y)
 
 int main(int argc, char **argv)
 {
-    wchar_t *wstr = L"百问网www.100ask.net";
+    wchar_t *wstr = L"灵魂汁子~~浇给";
+    wchar_t wstr_ls[2][100] = {L"灵魂汁子~",L"浇给!"}; 
+    unsigned int w_str_ls_len = 2;
 
     FT_Library    library;
     FT_Face       face;
@@ -224,18 +241,23 @@ int main(int argc, char **argv)
     FT_BBox bbox;
     int font_size = 24;
     int lcd_x, lcd_y;
+    double angle = 0;
+    //FT_Matrix	  matrix;				  /* transformation matrix */
 
     if (argc < 4)
     {
-        printf("Usage : %s <font_file> <lcd_x> <lcd_y> [font_size]\n", argv[0]);
+        printf("Usage : %s <font_file> <lcd_x> <lcd_y> [font_size] [angle]\n", argv[0]);
         return -1;
     }
 
-    lcd_x = strtoul(argv[2], NULL, 0);      
+    lcd_x = strtoul(argv[2], NULL, 0);   /*strtoul: 用于将字符串转换无符号长整型*/
     lcd_y = strtoul(argv[3], NULL, 0);      
     
     if (argc == 5)
-        font_size = strtoul(argv[4], NULL, 0);      
+        font_size = strtoul(argv[4], NULL, 0); 
+
+    if (argc == 6)
+        angle = ( 1.0* strtoul(argv[5], NULL, 0) / 360 ) * 3.14159 * 2; 
 
     fd_fb = open("/dev/fb0", O_RDWR);
     if (fd_fb < 0)
@@ -244,13 +266,13 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (ioctl(fd_fb, FBIOGET_VSCREENINFO, &var))
-    {
+    if (ioctl(fd_fb, FBIOGET_VSCREENINFO, &var))    /* ioctl是一个用于设备控制的系统调用（system call）函数*/
+    {                                               // 获取设备可变信息
         printf("can't get var\n");
         return -1;
     }
 
-    if (ioctl(fd_fb, FBIOGET_FSCREENINFO, &fix))
+    if (ioctl(fd_fb, FBIOGET_FSCREENINFO, &fix))    // 获取设备固定信息
     {
         printf("can't get fix\n");
         return -1;
@@ -259,7 +281,7 @@ int main(int argc, char **argv)
     line_width  = var.xres * var.bits_per_pixel / 8;
     pixel_width = var.bits_per_pixel / 8;
     screen_size = var.xres * var.yres * var.bits_per_pixel / 8;
-    fbmem = (unsigned char *)mmap(NULL , screen_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd_fb, 0);
+    fbmem = (unsigned char *)mmap(NULL , screen_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd_fb, 0); /*映射文件到内存，从而读写文件*/
     if (fbmem == (unsigned char *)-1)
     {
         printf("can't mmap\n");
@@ -275,7 +297,12 @@ int main(int argc, char **argv)
 
     FT_Set_Pixel_Sizes(face, font_size, 0);
 
-    display_string(face, wstr, lcd_x, lcd_y);
+    for(int i = 0; i < w_str_ls_len; i++)
+    {
+	   
+	   display_string(face, (wchar_t *)&wstr_ls[i], lcd_x, lcd_y + font_size * i, angle); 
+    }
+    // display_string(face, wstr, lcd_x, lcd_y);
     
     return 0;   
 }
