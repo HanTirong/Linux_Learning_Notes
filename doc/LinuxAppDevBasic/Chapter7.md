@@ -58,14 +58,19 @@ B: KEY=c
 - 因为各种event被定义在内核的 `input.h` 文件中，所以在写代码的时候需要include工具链提供的
 - 进入某个目录，查找某个文件 `find -name input.h`
 3. 系统调用`ioctl()`函数来获取设备硬件信息和驱动程序打交道
+4. [代码](../../source/LinuxAppDevBasic/source/11_input/01_app_demo/01_get_input_info.c)
 
 ## [7-3] 查询休眠唤醒方式读取输入数据
-
+1. 轮询方式：app调用`open()`传入 O_NONBLOCK 表示非阻塞；当调用`read()`读取数据时，如果驱动程序里有数据，立即返回数据；否则返回错误
+2. 休眠唤醒方式： 调用`open()`不传入 O_NONBLOCK；当调用`read()`读取数据时，如果驱动程序里有数据，立即返回数据；否则会在内核中休眠，当有数据驱动程序时会将app唤醒
+3. [代码](../../source/LinuxAppDevBasic/source/11_input/01_app_demo/02_input_read.c)
 
 
 ## [7-4] POLL SELECT方式读取输入数据
-
-
+1. POLL, SELECT机制完全一样，只是app接口函数不一样
+2. 先从poll函数的返回值判断是否超时，再去判断fds数组中的revents
+3. [poll代码](../../source/LinuxAppDevBasic/source/11_input/01_app_demo/03_input_read_poll.c)
+4. [select代码](../../source/LinuxAppDevBasic/source/11_input/01_app_demo/04_input_read_select.c)
 
 ## [7-5] 异步通知方式读取输入数据
 

@@ -10,10 +10,10 @@
 #include <poll.h>
 
 
-/* ./01_get_input_info /dev/input/event0 */
+/* ./01_get_input_info /dev/input/event0 /dev/input/event1 */
 int main(int argc, char **argv)
 {
-	int fd;
+	int fd,fd2;
 	int err;
 	int len;
 	int ret;
@@ -23,8 +23,11 @@ int main(int argc, char **argv)
 	struct input_id id;
 	unsigned int evbit[2];
 	struct input_event event;
-	struct pollfd fds[1];
-	nfds_t nfds = 1;
+	struct pollfd fds[2];
+	nfds_t nfds = 2;
+	int j = 0;
+	int fd_tmp;
+
 	
 	char *ev_names[] = {
 		"EV_SYN ",
@@ -52,58 +55,92 @@ int main(int argc, char **argv)
 		"EV_PWR ",
 		};
 	
-	if (argc != 2)
+	if (argc != 3)
 	{
-		printf("Usage: %s <dev>\n", argv[0]);
+		printf("Usage: %s <dev> <dev2>\n", argv[0]);
 		return -1;
 	}
 
-	fd = open(argv[1], O_RDWR | O_NONBLOCK);
+	fd = open(argv[1], O_RDWR | O_NONBLOCK);/*非阻塞方式： 因为一次poll可以多次读*/
+	fd2 = open(argv[2], O_RDWR | O_NONBLOCK);
 	if (fd < 0)
 	{
 		printf("open %s err\n", argv[1]);
 		return -1;
 	}
-
-	err = ioctl(fd, EVIOCGID, &id);
-	if (err == 0)
+	if (fd2 < 0)
 	{
-		printf("bustype = 0x%x\n", id.bustype );
-		printf("vendor	= 0x%x\n", id.vendor  );
-		printf("product = 0x%x\n", id.product );
-		printf("version = 0x%x\n", id.version );
+		printf("open %s err\n", argv[2]);
+		return -1;
 	}
 
-	len = ioctl(fd, EVIOCGBIT(0, sizeof(evbit)), &evbit);
-	if (len > 0 && len <= sizeof(evbit))
-	{
-		printf("support ev type: ");
-		for (i = 0; i < len; i++)
-		{
-			byte = ((unsigned char *)evbit)[i];
-			for (bit = 0; bit < 8; bit++)
-			{
-				if (byte & (1<<bit)) {
-					printf("%s ", ev_names[i*8 + bit]);
-				}
-			}
-		}
-		printf("\n");
-	}
+	//err = ioctl(fd, EVIOCGID, &id);
+	// if (err == 0)
+	// {
+	// 	printf("bustype = 0x%x\n", id.bustype );
+	// 	printf("vendor	= 0x%x\n", id.vendor  );
+	// 	printf("product = 0x%x\n", id.product );
+	// 	printf("version = 0x%x\n", id.version );
+	// }
+
+	// len = ioctl(fd, EVIOCGBIT(0, sizeof(evbit)), &evbit);
+	// if (len > 0 && len <= sizeof(evbit))
+	// {
+	// 	printf("support ev type: ");
+	// 	for (i = 0; i < len; i++)
+	// 	{
+	// 		byte = ((unsigned char *)evbit)[i];
+	// 		for (bit = 0; bit < 8; bit++)
+	// 		{
+	// 			if (byte & (1<<bit)) {
+	// 				printf("%s ", ev_names[i*8 + bit]);
+	// 			}
+	// 		}
+	// 	}
+	// 	printf("\n");
+	// }
 
 	while (1)
 	{
 		fds[0].fd = fd;
-		fds[0].events  = POLLIN;
+		fds[0].events  = POLLIN;	/*有数据可读*/
 		fds[0].revents = 0;
-		ret = poll(fds, nfds, 5000);
+
+		fds[1].fd = fd2;
+		fds[1].events = POLLIN;
+		fds[1].revents = 0;
+		ret = poll(fds, nfds, 5000);	/* 5000ms */
 		if (ret > 0)
 		{
-			if (fds[0].revents == POLLIN)
+			// if (fds[0].revents == POLLIN)
+			// {
+			// 	while (read(fd, &event, sizeof(event)) == sizeof(event))
+			// 	{
+			// 		printf("fds[0]***get event: type = 0x%x, code = 0x%x, value = 0x%x\n", event.type, event.code, event.value);
+			// 	}
+			// }
+			// else if(fds[1].revents == POLLIN)
+			// {
+			// 	while (read(fd2, &event, sizeof(event)) == sizeof(event))
+			// 	{
+			// 		printf("fds[1]***get event: type = 0x%x, code = 0x%x, value = 0x%x\n", event.type, event.code, event.value);
+			// 	}
+			// }
+			for(j =0;j < nfds; j++)
 			{
-				while (read(fd, &event, sizeof(event)) == sizeof(event))
+				if(fds[j].revents == POLLIN)
 				{
-					printf("get event: type = 0x%x, code = 0x%x, value = 0x%x\n", event.type, event.code, event.value);
+					if(j == 0)
+					{
+						fd_tmp = fd;
+					}
+					else if(j == 1){
+						fd_tmp = fd2;
+					}
+					while (read(fd_tmp, &event, sizeof(event)) == sizeof(event))
+					{
+						printf("fds[%d]***get event: type = 0x%x, code = 0x%x, value = 0x%x\n", j, event.type, event.code, event.value);
+					}	
 				}
 			}
 		}

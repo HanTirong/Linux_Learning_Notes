@@ -93,10 +93,10 @@ int main(int argc, char **argv)
 		}
 		printf("\n");
 	}
-
+	/*读取按键值*/
 	while (1)
 	{
-		len = read(fd, &event, sizeof(event));
+		len = read(fd, &event, sizeof(event));	/* 驱动程序：endev_read() */
 		if (len == sizeof(event))
 		{
 			printf("get event: type = 0x%x, code = 0x%x, value = 0x%x\n", event.type, event.code, event.value);
